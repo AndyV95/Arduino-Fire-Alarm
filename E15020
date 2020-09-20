@@ -1,0 +1,68 @@
+#include <LiquidCrystal.h>//Βιβλιοθήκη για LCD oθόνη
+
+//Ενεργοποίηση LCD Οθόνης
+#define rs 12
+#define en 11
+#define d4 5
+#define d5 4
+#define d6 3
+#define d7 2
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+int flamePin= 0;//Θέτουμε Αναλογικό PIN(Α0) για αισθητήρα φλόγας
+int buzzerPin= 13;//θέτουμε Ψηφιακό PIN(PWM 13) για συναγερμό
+int val=0;//Αρχικοποίηση επιτρεπτής τιμής απόστασης φλόγας από αισθητήρα
+
+void setup() {
+//Ενεργοποίηση Συναγερμού
+ Serial.begin(9600);
+ lcd.begin(16, 2); 
+ pinMode(buzzerPin,OUTPUT); 
+ pinMode(flamePin,INPUT);
+  lcd.setCursor(0, 0);
+  lcd.print("activating alarm");
+    for(int i = 0; i <15; i++){
+      if (i==4)
+      {
+         lcd.setCursor(0, 1);
+         lcd.print(".");
+        }
+       else  lcd.print(".");
+      delay(500);
+      }
+    lcd.setCursor(11, 1);
+    lcd.print("Done");
+    delay(1000);
+    lcd.clear(); 
+    lcd.setCursor(1, 0);
+    lcd.print("Sensor Active");
+    delay(1500);
+    lcd.clear(); 
+}
+void loop() {
+  val=analogRead(flamePin);
+  if (val>=600) //Κατάσταση Πυρκαγιάς
+  {
+     digitalWrite(buzzerPin,HIGH);
+     lcd.setCursor(0, 0);
+     lcd.print(" Warning : ");
+     lcd.print("Fire");
+     lcd.setCursor(0, 1);
+     lcd.print("  is Detected");
+     Serial.println(val);
+     Serial.print("\t");
+     Serial.print("Fire is Detected");   
+  }
+  else
+  {
+     digitalWrite(buzzerPin,LOW);
+     lcd.setCursor(0, 0);
+     lcd.print("Sensor : ");
+     lcd.print("No Fire");
+     Serial.println(val);
+     Serial.print("\t");
+     Serial.println("No Fire");   
+  } 
+  delay(500);
+  lcd.clear();
+}
